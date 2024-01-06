@@ -23,7 +23,38 @@
         <button id="startBreak" type="button" disabled>Start Break</button>
         <button id="endBreak" type="button" disabled>End Break</button>
     </form>
+    <!-- HTML Form for Sign-In and Sign-Out -->
+<form id="signInOutForm" action="http://127.0.0.1:5000/login" method="post">
+    <input type="number" id="userId" name="user_id" placeholder="Enter your User ID">
+    <select name="action">
+        <option value="sign-in">Sign In</option>
+        <option value="sign-out">Sign Out</option>
+    </select>
+    <button type="submit">Submit</button>
+</form>
 
+    <div id="adminDashboard">
+        <h2>Admin Dashboard</h2>
+        <div id="dashboardContent">
+            <!-- Dashboard content will be loaded here -->
+        </div>
+    </div>
+    
+    <script>
+        // Assuming you have a function to check if the user is an admin
+        if (isAdmin()) {
+            fetch('http://127.0.0.1:5000/admin/dashboard')
+                .then(response => response.json())
+                .then(data => {
+                    let contentHtml = '<h3>User Activities</h3>';
+                    data.activities.forEach(activity => {
+                        contentHtml += `<p>User ID: ${activity.user_id}, Action: ${activity.action_type}, Time: ${activity.timestamp}</p>`;
+                    });
+                    document.getElementById('dashboardContent').innerHTML = contentHtml;
+                })
+                .catch(error => console.error('Error:', error));
+        }
+    </script>
     <script src="script.js"></script>
 </body>
 </html>
