@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FIT SHIRTS Login</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Welcome to FIT SHIRTS</h1>
+    
+    <!-- User Type Selection -->
+    <select id="userType" name="userType" onchange="toggleSignInOut(this.value)">
+        <option value="employee">Employee</option>
+        <option value="agency">Agency Staff</option>
+        <option value="visitor">Visitor</option>
+    </select>
+
+    <!-- Sign In/Out Form -->
+    <form id="signInOutForm" action="http://127.0.0.1:5000/login" method="post">
+        <input type="text" id="username" name="username" placeholder="Enter your username">
+        <input type="hidden" id="userAction" name="action" value="sign-in">
+        <button type="submit" id="signInButton">Sign In</button>
+        <button type="button" id="signOutButton" onclick="signOut()" disabled>Sign Out</button>
+        <button id="startBreak" type="button" disabled>Start Break</button>
+        <button id="endBreak" type="button" disabled>End Break</button>
+    </form>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
