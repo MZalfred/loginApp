@@ -70,6 +70,23 @@ def get_activities_by_date(user_id, start_date, end_date):
         c.execute(query, (user_id, start_date, end_date))
         return c.fetchall()
 
+# Function to get dashboard data
+def get_dashboard_data():
+    # Fetches data for the admin dashboard.
+    with sqlite3.connect('fitshirts.db') as conn:
+        c = conn.cursor()
+        # Fetch user activity for users with IDs 60 and above
+        c.execute('''SELECT * FROM activity_log WHERE user_id >= 60''')
+        activities = c.fetchall()
+        # Additional queries for more dashboard data can be added here
+    return activities
+
+@app.route('/admin/dashboard', methods=['GET'])
+def admin_dashboard():
+    # Route for an admin dashboard that provides various data points.
+    dashboard_data = get_dashboard_data()
+    return jsonify({'activities': dashboard_data})
+
 # Route to handle login actions
 @app.route('/login', methods=['POST'])
 def login():
@@ -82,16 +99,6 @@ def login():
         return f"{username} {user_action}"
     except KeyError:
         return "Missing username or action", 400
-
-@app.route('/admin/dashboard', methods=['GET'])
-def admin_dashboard():
-    # Placeholder route for an admin dashboard.
-    # In a real application, implement queries to gather and return necessary data.
-    dashboard_data = {
-        'total_users': 0,  # Replace with actual data
-        'recent_activities': []  # Replace with actual data
-    }
-    return jsonify(dashboard_data)
 
 # Route to fetch activities
 @app.route('/activities', methods=['GET'])
