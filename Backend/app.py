@@ -1,3 +1,4 @@
+from datetime import datetime
 from flask import Flask, request, jsonify
 import sqlite3
 
@@ -35,6 +36,23 @@ def init_db():
 
 # Call init_db to initialize database
 init_db()
+
+def calculate_total_hours(user_id, date):
+    with sqlite3.connect('fitshirts.db') as conn:
+        c = conn.cursor()
+        query = '''SELECT SUM(julianday(end_time) - julianday(start_time)) * 24 as total_hours
+                   FROM activity_log 
+                   WHERE user_id = ? AND DATE(timestamp) = ? AND action_type IN ('sign-in', 'sign-out')'''
+        c.execute(query, (user_id, date))
+        result = c.fetchone()
+        return result[0] if result else 0
+
+@app.route('/report/total_hours', methods=['GET'])
+def total_hours():
+    user_id = request.args.get('user_id')
+    date = request.args.get('date', datetime.now().strftime('%Y-%m-%d'))  # default to current date
+    total_hours = calculate_total_hours(user_id, date)
+    return jsonify({'user_id': user_id, 'date': date, 'total_hours': total_hours})
 
 # Function to get activities by date
 def get_activities_by_date(user_id, start_date, end_date):
