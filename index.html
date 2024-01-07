@@ -23,25 +23,42 @@
         <button id="startBreak" type="button" disabled>Start Break</button>
         <button id="endBreak" type="button" disabled>End Break</button>
     </form>
-    <!-- HTML Form for Sign-In and Sign-Out -->
-<form id="signInOutForm" action="http://127.0.0.1:5000/login" method="post">
-    <input type="number" id="userId" name="user_id" placeholder="Enter your User ID">
-    <select name="action">
-        <option value="sign-in">Sign In</option>
-        <option value="sign-out">Sign Out</option>
-    </select>
-    <button type="submit">Submit</button>
-</form>
 
+    <!-- Admin Dashboard Section -->
     <div id="adminDashboard">
         <h2>Admin Dashboard</h2>
         <div id="dashboardContent">
             <!-- Dashboard content will be loaded here -->
         </div>
     </div>
-    
+
+    <!-- Date Picker for Reports -->
+    <input type="date" id="startDate">
+    <input type="date" id="endDate">
+    <button onclick="fetchReport()">Get Report</button>
+
+    <!-- Table for Displaying Reports -->
+    <table id="reportTable">
+        <thead>
+            <tr>
+                <th>User ID</th>
+                <th>Action</th>
+                <th>Timestamp</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Report data will be inserted here -->
+        </tbody>
+    </table>
+
     <script>
-        // Assuming you have a function to check if the user is an admin
+        // Function to check if the user is an admin
+        function isAdmin() {
+            // Placeholder logic to determine if a user is an admin
+            return true; // Assuming every user is an admin for now
+        }
+
+        // Script to fetch data for the admin dashboard
         if (isAdmin()) {
             fetch('http://127.0.0.1:5000/admin/dashboard')
                 .then(response => response.json())
@@ -54,37 +71,32 @@
                 })
                 .catch(error => console.error('Error:', error));
         }
+
+        // Function to fetch report data based on the selected dates
+        function fetchReport() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            fetch(`http://127.0.0.1:5000/fetch-logs?start=${startDate}&end=${endDate}`)
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.getElementById('reportTable').getElementsByTagName('tbody')[0];
+                    tableBody.innerHTML = ''; // Clear existing data
+                    data.forEach(row => {
+                        let tr = `<tr>
+                            <td>${row.user_id}</td>
+                            <td>${row.action}</td>
+                            <td>${row.timestamp}</td>
+                        </tr>`;
+                        tableBody.innerHTML += tr;
+                    });
+                })
+                .catch(error => console.error('Error:', error));
+        }
     </script>
-    <!-- Report Section -->
-<div>
-    <h2>Activity Report</h2>
-    <input type="number" id="reportUserId" placeholder="User ID (optional)">
-    <input type="date" id="reportDate" placeholder="Date (optional)">
-    <button onclick="fetchReport()">Get Report</button>
-    <div id="reportResults"></div>
-</div>
 
-<script>
-function fetchReport() {
-    const userId = document.getElementById('reportUserId').value;
-    const date = document.getElementById('reportDate').value;
-    let url = `http://127.0.0.1:5000/activity-report?`;
-
-    if (userId) url += `user_id=${userId}&`;
-    if (date) url += `date=${date}`;
-
-    fetch(url)
-        .then(response => response.json())
-        .then(data => {
-            let resultsHtml = data.map(activity => 
-                `<p>User ID: ${activity[1]}, Action: ${activity[2]}, Time: ${activity[3]}</p>`
-            ).join('');
-            document.getElementById('reportResults').innerHTML = resultsHtml;
-        })
-        .catch(error => console.error('Error:', error));
-}
-</script>
-
+    <footer>
+        <p>&copy; 2024 FIT SHIRTS</p>
+    </footer>
     <script src="script.js"></script>
 </body>
 </html>
