@@ -119,6 +119,29 @@ def activities():
     activities = get_activities_by_date(user_id, start_date, end_date)
     return jsonify(activities)
 
+@app.route('/activity-report', methods=['GET'])
+def activity_report():
+    user_id = request.args.get('user_id')  # Optional: for a specific user
+    date = request.args.get('date')  # Optional: for a specific date
+
+    query = 'SELECT * FROM activity_log'
+    conditions = []
+
+    if user_id:
+        conditions.append(f'user_id = {user_id}')
+    if date:
+        conditions.append(f"DATE(timestamp) = DATE('{date}')")
+
+    if conditions:
+        query += ' WHERE ' + ' AND '.join(conditions)
+
+    with sqlite3.connect('fitshirts.db') as conn:
+        c = conn.cursor()
+        c.execute(query)
+        activities = c.fetchall()
+    
+    return jsonify(activities)
+
 # Running the Flask app
 if __name__ == '__main__':
     app.run(debug=True)
