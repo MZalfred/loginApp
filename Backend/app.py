@@ -35,8 +35,14 @@ def init_db():
     # Initializes the database and creates necessary tables.
     with sqlite3.connect('fitshirts.db') as conn:
         c = conn.cursor()
-        # Create necessary tables
-        # ... (your table creation code here)
+        # Users Table (if not already created)
+        c.execute('''CREATE TABLE IF NOT EXISTS users 
+                     (user_id INTEGER PRIMARY KEY, username TEXT)''')
+        # Activity Log Table to record sign-in and sign-out with timestamps
+        c.execute('''CREATE TABLE IF NOT EXISTS activity_log 
+                     (log_id INTEGER PRIMARY KEY, user_id INTEGER, action_type TEXT, 
+                      timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP)''')
+        conn.commit()
 
 # Call init_db to initialize database
 init_db()
@@ -90,15 +96,18 @@ def admin_dashboard():
 # Route to handle login actions
 @app.route('/login', methods=['POST'])
 def login():
-    # Handles user login actions. Currently, it only returns the username and action.
-    try:
-        username = request.form['username']
-        user_action = request.form['action']  # 'sign-in' or 'sign-out'
-        # Assuming log_login is defined elsewhere or you can define it
-        # log_login(username, user_action)
-        return f"{username} {user_action}"
-    except KeyError:
-        return "Missing username or action", 400
+    user_id = request.form.get('user_id')
+    action = request.form.get('action')  # 'sign-in' or 'sign-out'
+    
+    if not user_id or action not in ['sign-in', 'sign-out']:
+        return jsonify({"error": "Invalid data"}), 400
+    
+    with sqlite3.connect('fitshirts.db') as conn:
+        c = conn.cursor()
+        c.execute('INSERT INTO activity_log (user_id, action_type) VALUES (?, ?)', (user_id, action))
+        conn.commit()
+    
+    return jsonify({"status": "success", "user_id": user_id, "action": action, "timestamp": datetime.now().isoformat()})
 
 # Route to fetch activities
 @app.route('/activities', methods=['GET'])
