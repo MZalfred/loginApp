@@ -39,5 +39,24 @@ function toggleButtonState(userAction) {
 }
 
 function fetchReport() {
-    // ... (existing fetchReport function)
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
+    const url = `http://127.0.0.1:5000/fetch-logs?start=${startDate}&end=${endDate}`;
+
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            const tableBody = document.getElementById('reportTable').getElementsByTagName('tbody')[0];
+            tableBody.innerHTML = ''; // Clear existing data
+
+            data.forEach(row => {
+                let tr = `<tr>
+                    <td>${row.user_id}</td>
+                    <td>${row.action}</td>
+                    <td>${row.timestamp}</td>
+                </tr>`;
+                tableBody.innerHTML += tr;
+            });
+        })
+        .catch(error => console.error('Error:', error));
 }
