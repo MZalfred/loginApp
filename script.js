@@ -31,3 +31,13 @@ document.getElementById('signInOutForm').addEventListener('submit', function(eve
     */
 });
 
+function fetchActivityReport() {
+    // Fetch and display the activity report
+    // Placeholder function - expand with actual AJAX request
+}
+
+document.getElementById('signInOutForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    // Handle the sign-in or sign-out action
+    // Placeholder - expand with actual form handling logic
+});
