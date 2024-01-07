@@ -17,6 +17,17 @@ def log_activity(user_id, action_type):
     with sqlite3.connect('fitshirts.db') as conn:
         c = conn.cursor()
         c.execute('INSERT INTO activity_log (user_id, action_type) VALUES (?, ?)', (user_id, action_type))
+ 
+def query_db(query, args=(), one=False):
+    with sqlite3.connect('fitshirts.db') as conn:
+        cur = conn.execute(query, args)
+        rv = cur.fetchall()
+        return (rv[0] if rv else None) if one else rv
+
+@app.route('/fetch-logs', methods=['GET'])
+def fetch_logs():
+    logs = query_db('SELECT * FROM activity_log ORDER BY timestamp DESC LIMIT 100')
+    return jsonify(logs)
 
 # Route to log activities
 @app.route('/activity', methods=['POST'])
