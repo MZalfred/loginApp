@@ -55,6 +55,36 @@
                 .catch(error => console.error('Error:', error));
         }
     </script>
+    <!-- Report Section -->
+<div>
+    <h2>Activity Report</h2>
+    <input type="number" id="reportUserId" placeholder="User ID (optional)">
+    <input type="date" id="reportDate" placeholder="Date (optional)">
+    <button onclick="fetchReport()">Get Report</button>
+    <div id="reportResults"></div>
+</div>
+
+<script>
+function fetchReport() {
+    const userId = document.getElementById('reportUserId').value;
+    const date = document.getElementById('reportDate').value;
+    let url = `http://127.0.0.1:5000/activity-report?`;
+
+    if (userId) url += `user_id=${userId}&`;
+    if (date) url += `date=${date}`;
+
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            let resultsHtml = data.map(activity => 
+                `<p>User ID: ${activity[1]}, Action: ${activity[2]}, Time: ${activity[3]}</p>`
+            ).join('');
+            document.getElementById('reportResults').innerHTML = resultsHtml;
+        })
+        .catch(error => console.error('Error:', error));
+}
+</script>
+
     <script src="script.js"></script>
 </body>
 </html>
